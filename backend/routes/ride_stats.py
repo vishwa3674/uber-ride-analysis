@@ -1,19 +1,16 @@
 import pandas as pd
 from flask import Blueprint, jsonify
+from sklearn.cluster import KMeans
 import os
 
 ride_stats = Blueprint("ride_stats", __name__)
 
 @ride_stats.route("/api/rides/hourly")
 def rides_per_hour():
-
     data_path = os.path.join("processed_data", "uber_april_cleaned.csv")
     df = pd.read_csv(data_path)
-
     hourly_counts = df.groupby("hour").size().reset_index(name="ride_count")
-
     result = hourly_counts.to_dict(orient="records")
-
     return jsonify(result)
 
 @ride_stats.route("/api/rides/daily")
@@ -34,7 +31,7 @@ def rides_by_weekday():
 def ride_heatmap():
     data_path = os.path.join("processed_data", "uber_april_cleaned.csv")
     df = pd.read_csv(data_path)
-    sample_df = df[['Lat', 'Lon']].dropna().sample(n=5000, random_state=42)
+    sample_df = df[['Lat', 'Lon']].dropna().sample(n=5000, random_state=42) #Limt is set 5000 to reduce frontend load
     return jsonify(sample_df.to_dict(orient="records"))
 
 @ride_stats.route("/api/rides/summary")
@@ -53,3 +50,14 @@ def ride_summary():
         "max_rides_per_day": int(max_day)
     }
     return jsonify(summary)
+
+@ride_stats.route("/api/rides/clusters")
+def pickup_clusters():
+    data_path = os.path.join("processed_data", "uber_april_cleaned.csv")
+    df = pd.read_csv(data_path)
+    coords = df[['Lat', 'Lon']].dropna()
+
+    kmeans = KMeans(n_clusters=5, random_state=42)
+    coords['cluster'] = kmeans.fit_predict(coords)
+
+    return jsonify(coords.sample(n=1000, random_state=42).to_dict(orient='records'))  # Sample to reduce frontend load
