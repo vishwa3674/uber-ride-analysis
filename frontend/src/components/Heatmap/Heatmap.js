@@ -13,23 +13,23 @@ const HeatLayer = ({ points }) => {
     if (!points.length) return;
 
     const heatLayer = L.heatLayer(points, {
-      radius: 20,
-      blur: 25,
+      radius: 25,
+      blur: 15,
       maxZoom: 17,
       max: 1.0,
-      minOpacity: 0.1,
+      minOpacity: 0.05,
       gradient: {
-        0.0: '#313695',
-        0.1: '#4575b4',
-        0.2: '#74add1',
-        0.3: '#abd9e9',
-        0.4: '#e0f3f8',
-        0.5: '#ffffcc',
-        0.6: '#fee090',
-        0.7: '#fdae61',
-        0.8: '#f46d43',
-        0.9: '#d73027',
-        1.0: '#a50026'
+        0.0: '#0000ff',   // Blue for low density
+        0.1: '#0040ff',
+        0.2: '#0080ff',
+        0.3: '#00bfff',
+        0.4: '#00ffff',   // Cyan
+        0.5: '#40ff80',
+        0.6: '#80ff40',
+        0.7: '#ffff00',   // Yellow
+        0.8: '#ff8000',
+        0.9: '#ff4000',
+        1.0: '#ff0000'    // Red for high density
       }
     }).addTo(map);
 
@@ -62,21 +62,29 @@ const Heatmap = () => {
       return [lat, lon, count]; // [latitude, longitude, intensity]
     });
 
-    // Find max count for normalization
-    const maxCount = Math.max(...Object.values(coordinateCount));
+    // Find max and min counts for better normalization
+    const counts = Object.values(coordinateCount);
+    const maxCount = Math.max(...counts);
+    const minCount = Math.min(...counts);
     
-    // Normalize intensities to 0-1 range
-    return processedPoints.map(([lat, lon, count]) => [
-      lat, 
-      lon, 
-      count / maxCount // Normalized intensity
-    ]);
+    console.log(`Data processing: ${processedPoints.length} unique locations, max count: ${maxCount}, min count: ${minCount}`);
+    
+    // Use logarithmic scaling for better visualization of density differences
+    return processedPoints.map(([lat, lon, count]) => {
+      // Logarithmic normalization for better spread
+      const logCount = Math.log(count + 1);
+      const logMax = Math.log(maxCount + 1);
+      const normalizedIntensity = logCount / logMax;
+      
+      return [lat, lon, Math.max(0.1, normalizedIntensity)]; // Ensure minimum visibility
+    });
   };
 
   useEffect(() => {
     setLoading(true);
     api.get("/rides/heatmap")
       .then((res) => {
+        console.log(`Received ${res.data.length} data points from API`);
         const processedPoints = processHeatmapData(res.data);
         setPoints(processedPoints);
         setStats({
@@ -96,6 +104,7 @@ const Heatmap = () => {
     setLoading(true);
     api.get("/rides/heatmap")
       .then((res) => {
+        console.log(`Refreshed with ${res.data.length} data points`);
         const processedPoints = processHeatmapData(res.data);
         setPoints(processedPoints);
         setStats({

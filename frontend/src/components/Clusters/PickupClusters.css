@@ -1,16 +1,17 @@
-/* Heatmap.css */
-.heatmap-container {
+/* PickupClusters.css */
+.clusters-container {
   padding: 20px;
+  padding-top: 100px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-.heatmap-header {
+.clusters-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   padding: 24px;
@@ -18,11 +19,11 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.heatmap-title-section {
+.clusters-title-section {
   flex: 1;
 }
 
-.heatmap-title {
+.clusters-title {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -36,14 +37,14 @@
   font-size: 1.5rem;
 }
 
-.heatmap-description {
+.clusters-description {
   color: #6b7280;
   font-size: 1rem;
   margin: 0;
   line-height: 1.5;
 }
 
-.heatmap-controls {
+.clusters-controls {
   display: flex;
   gap: 12px;
 }
@@ -78,19 +79,55 @@
   font-size: 1rem;
 }
 
-.heatmap-stats {
-  display: flex;
+.clusters-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
-  margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
-.stat-item {
+.stat-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.total-points-icon {
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+}
+
+.clusters-icon {
+  background: linear-gradient(135deg, #4ECDC4, #44A08D);
+}
+
+.update-icon {
+  background: linear-gradient(135deg, #45B7D1, #96C93D);
+}
+
+.stat-content {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -105,28 +142,26 @@
 }
 
 .stat-value {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #1f2937;
 }
 
-.status-active {
-  color: #059669 !important;
-}
-
-.status-error {
-  color: #dc2626 !important;
+.map-legend-container {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  height: 600px;
 }
 
 .map-wrapper {
   position: relative;
-  height: 600px;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.heatmap-leaflet {
+.clusters-leaflet {
   width: 100%;
   height: 100%;
   z-index: 1;
@@ -181,53 +216,111 @@
   transform: translateY(-2px);
 }
 
-.heatmap-legend {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+.clusters-legend {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  min-width: 150px;
-  z-index: 1000;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .legend-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 12px 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 20px 0;
   text-align: center;
 }
 
-.legend-gradient {
-  height: 12px;
-  border-radius: 6px;
-  background: linear-gradient(to right, 
-    #0000ff 0%,    /* Blue for low density */
-    #0040ff 10%,
-    #0080ff 20%,
-    #00bfff 30%,
-    #00ffff 40%,   /* Cyan */
-    #40ff80 50%,
-    #80ff40 60%,
-    #ffff00 70%,   /* Yellow */
-    #ff8000 80%,
-    #ff4000 90%,
-    #ff0000 100%   /* Red for high density */
-  );
-  margin-bottom: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+.legend-items {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.legend-labels {
+.legend-item {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.legend-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateX(4px);
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.legend-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.legend-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.legend-count {
   font-size: 0.75rem;
   color: #6b7280;
+}
+
+.legend-summary {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-label {
+  font-size: 0.875rem;
   font-weight: 500;
+  color: #6b7280;
+}
+
+.summary-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.status-active {
+  color: #059669 !important;
+}
+
+.cluster-tooltip {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.cluster-tooltip strong {
+  color: #1f2937;
 }
 
 @keyframes spin {
@@ -236,41 +329,55 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .map-legend-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .map-wrapper {
+    height: 500px;
+  }
+  
+  .clusters-legend {
+    max-height: 400px;
+  }
+}
+
 @media (max-width: 768px) {
-  .heatmap-container {
+  .clusters-container {
     padding: 16px;
   }
   
-  .heatmap-header {
+  .clusters-header {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
   }
   
-  .heatmap-stats {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .stat-item {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  .clusters-stats {
+    grid-template-columns: 1fr;
   }
   
   .map-wrapper {
     height: 400px;
   }
   
-  .heatmap-legend {
-    bottom: 10px;
-    right: 10px;
-    left: 10px;
-    min-width: auto;
+  .clusters-title {
+    font-size: 1.5rem;
   }
   
-  .heatmap-title {
-    font-size: 1.5rem;
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
   }
 }
 
@@ -279,12 +386,18 @@
     height: 300px;
   }
   
-  .heatmap-title {
+  .clusters-title {
     font-size: 1.25rem;
   }
   
   .refresh-btn {
     padding: 10px 16px;
     font-size: 0.875rem;
+  }
+  
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
   }
 }
